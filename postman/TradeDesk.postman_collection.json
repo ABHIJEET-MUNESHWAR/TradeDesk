@@ -1,0 +1,127 @@
+{
+  "info": {
+    "name": "TradeDesk OMS",
+    "description": "GraphQL API for the TradeDesk brokerage order-management service. Set the baseUrl variable to your running instance (default http://localhost:8080).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" },
+    { "key": "accountId", "value": "acct-1" },
+    { "key": "orderId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "placeOrder (LIMIT BUY)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const data = pm.response.json().data;",
+              "if (data && data.placeOrder && data.placeOrder.orderId) {",
+              "  pm.collectionVariables.set('orderId', data.placeOrder.orderId);",
+              "}",
+              "pm.test('accepted', () => pm.expect(data.placeOrder.status).to.eql('ACCEPTED'));"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": { "raw": "{{baseUrl}}/graphql", "host": ["{{baseUrl}}"], "path": ["graphql"] },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"query\":\"mutation { placeOrder(accountId: \\\"{{accountId}}\\\", symbol: \\\"AAPL\\\", side: \\\"BUY\\\", orderType: \\\"LIMIT\\\", tif: \\\"DAY\\\", quantity: \\\"10\\\", limitPrice: \\\"150.00\\\") { orderId status idempotent } }\"}"
+        }
+      }
+    },
+    {
+      "name": "order (by id)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": { "raw": "{{baseUrl}}/graphql", "host": ["{{baseUrl}}"], "path": ["graphql"] },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"query\":\"query { order(id: \\\"{{orderId}}\\\") { id accountId symbol side status quantity filledQty avgFillPrice version } }\"}"
+        }
+      }
+    },
+    {
+      "name": "applyFill (full)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": { "raw": "{{baseUrl}}/graphql", "host": ["{{baseUrl}}"], "path": ["graphql"] },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"query\":\"mutation { applyFill(orderId: \\\"{{orderId}}\\\", quantity: \\\"10\\\", price: \\\"151.25\\\") { status filledQty avgFillPrice } }\"}"
+        }
+      }
+    },
+    {
+      "name": "positions (by account)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": { "raw": "{{baseUrl}}/graphql", "host": ["{{baseUrl}}"], "path": ["graphql"] },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"query\":\"query { positions(accountId: \\\"{{accountId}}\\\") { symbol netQty avgPrice } }\"}"
+        }
+      }
+    },
+    {
+      "name": "orders (recent)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": { "raw": "{{baseUrl}}/graphql", "host": ["{{baseUrl}}"], "path": ["graphql"] },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"query\":\"query { orders(limit: 20) { id symbol side status quantity } }\"}"
+        }
+      }
+    },
+    {
+      "name": "cancelOrder",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": { "raw": "{{baseUrl}}/graphql", "host": ["{{baseUrl}}"], "path": ["graphql"] },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"query\":\"mutation { cancelOrder(orderId: \\\"{{orderId}}\\\") { id status } }\"}"
+        }
+      }
+    },
+    {
+      "name": "health (GraphQL)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": { "raw": "{{baseUrl}}/graphql", "host": ["{{baseUrl}}"], "path": ["graphql"] },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"query\":\"query { health { status breaker } }\"}"
+        }
+      }
+    },
+    {
+      "name": "healthz (liveness)",
+      "request": {
+        "method": "GET",
+        "url": { "raw": "{{baseUrl}}/healthz", "host": ["{{baseUrl}}"], "path": ["healthz"] }
+      }
+    },
+    {
+      "name": "metrics (Prometheus)",
+      "request": {
+        "method": "GET",
+        "url": { "raw": "{{baseUrl}}/metrics", "host": ["{{baseUrl}}"], "path": ["metrics"] }
+      }
+    }
+  ]
+}

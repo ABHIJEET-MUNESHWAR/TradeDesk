@@ -1,0 +1,39 @@
+groups:
+  - name: tradedesk
+    rules:
+      - alert: HighOrderRejectionRate
+        expr: |
+          sum(rate(tradedesk_risk_checks_total{outcome="rejected"}[5m]))
+            / sum(rate(tradedesk_risk_checks_total[5m])) > 0.5
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "More than 50% of orders are being rejected by pre-trade risk"
+          description: "Investigate risk thresholds or a possible upstream data issue."
+
+      - alert: RiskCheckErrors
+        expr: rate(tradedesk_risk_checks_total{outcome="error"}[5m]) > 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Pre-trade risk checks are erroring (circuit breaker may be open)"
+          description: "Orders are being fail-closed. Check the risk dependency."
+
+      - alert: VenueRoutingFailures
+        expr: increase(tradedesk_route_failures_total[10m]) > 0
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Accepted orders are failing to route to the venue"
+          description: "Retries were exhausted routing to the execution venue."
+
+      - alert: PlaceOrderLatencyHigh
+        expr: histogram_quantile(0.99, sum(rate(tradedesk_place_order_seconds_bucket[5m])) by (le)) > 0.5
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "p99 PlaceOrder latency above 500ms"

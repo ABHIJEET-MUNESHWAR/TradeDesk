@@ -1,0 +1,12 @@
+# Build output (anchored to repo root so we never ignore a source package)
+/bin/
+/dist/
+/tradedesk
+
+# Test / coverage artefacts
+/coverage.out
+*.out
+
+# Local env
+.env
+.env.local
