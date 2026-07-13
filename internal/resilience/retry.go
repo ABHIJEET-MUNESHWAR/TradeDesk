@@ -39,14 +39,14 @@ type RetryPolicy struct {
 }
 
 // NewRetryPolicy builds a policy with sensible defaults filled in.
-func NewRetryPolicy(maxAttempts int, base, max time.Duration) *RetryPolicy {
+func NewRetryPolicy(maxAttempts int, base, maxDelay time.Duration) *RetryPolicy {
 	if maxAttempts < 1 {
 		maxAttempts = 1
 	}
 	return &RetryPolicy{
 		MaxAttempts: maxAttempts,
 		BaseDelay:   base,
-		MaxDelay:    max,
+		MaxDelay:    maxDelay,
 		rng:         rand.New(rand.NewSource(time.Now().UnixNano())),
 	}
 }

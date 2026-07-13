@@ -88,8 +88,8 @@ func NewBulkhead(maxConcurrent int) *Bulkhead {
 	return &Bulkhead{slots: make(chan struct{}, maxConcurrent)}
 }
 
-// Run executes op if a slot is free, else fails fast with ErrBulkheadFull. It
-// also honours context cancellation while waiting is disabled (fail-fast).
+// RunBulkhead executes op if a slot is free, else fails fast with ErrBulkheadFull.
+// It honours context cancellation while waiting is disabled (fail-fast).
 func RunBulkhead[T any](ctx context.Context, b *Bulkhead, op Operation[T]) (T, error) {
 	var zero T
 	select {

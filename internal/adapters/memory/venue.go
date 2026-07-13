@@ -20,7 +20,6 @@ type SimulatedVenue struct {
 	marketPx  domain.Money
 	filler    Filler
 	routed    []string
-	failNext  bool
 	failCount int
 }
 

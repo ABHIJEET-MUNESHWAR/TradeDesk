@@ -120,8 +120,11 @@ func TestRateLimiter(t *testing.T) {
 	now := time.Now()
 	clock := func() time.Time { return now }
 	rl := newRateLimiterWithClock(10, 2, clock)
-	if !rl.Allow() || !rl.Allow() {
-		t.Fatal("first two calls should be allowed (burst=2)")
+	if !rl.Allow() {
+		t.Fatal("first call should be allowed (burst=2)")
+	}
+	if !rl.Allow() {
+		t.Fatal("second call should be allowed (burst=2)")
 	}
 	if rl.Allow() {
 		t.Fatal("third immediate call should be denied")

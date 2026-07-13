@@ -83,12 +83,12 @@ func TestDivByQuantity(t *testing.T) {
 }
 
 func TestMoneyOverflow(t *testing.T) {
-	max := Money(9223372036854775807)
-	if _, err := max.Add(Money(1)); err == nil {
+	maxVal := Money(9223372036854775807)
+	if _, err := maxVal.Add(Money(1)); err == nil {
 		t.Fatal("expected add overflow")
 	}
-	min := Money(-9223372036854775808)
-	if _, err := min.Sub(Money(1)); err == nil {
+	minVal := Money(-9223372036854775808)
+	if _, err := minVal.Sub(Money(1)); err == nil {
 		t.Fatal("expected sub overflow")
 	}
 }
